@@ -7,7 +7,6 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Solana Web3 SDK الرسمي لبناء المعاملات وتقسيمها آلياً -->
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -46,7 +45,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-    <!-- نافذة حظر متصفحات التطبيقات (In-App Block Modal) -->
+    <!-- نافذة حظر متصفحات التطبيقات -->
     <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#04060b]/98 z-[999999] flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-500/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
             <div class="w-14 h-14 bg-purple-950 border border-purple-500/50 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">🛡️</div>
@@ -130,7 +129,7 @@
             </div>
         </div>
 
-        <!-- 💰 قسم الإحالات المباشر والإنساني -->
+        <!-- 💰 قسم الإحالات المحدّث والمصقول بإتقان -->
         <div class="claim-card rounded-2xl p-4.5 shadow-xl space-y-3.5">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -140,11 +139,11 @@
                         <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Auto Instant On-Chain Split</span>
                     </div>
                 </div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Zero Minimum Settlement</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Instant 20% Payout</span>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed" id="revShareDesc">
-                Get rewarded with <strong>20% instant commission</strong> for every token deployment. The yield is automatically sent directly to your Phantom wallet on-chain upon each deployment.
+                Get rewarded with <strong>20% instant commission</strong> for every token deployment. Yields are credited directly and automatically to your Phantom wallet on-chain instantly.
             </p>
 
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -352,8 +351,8 @@
                 connectWallet: "Connect Phantom",
                 revShare: "Sovereign Referral Yield Engine",
                 revShareSubtitle: "Auto Instant On-Chain Split",
-                revBadge: "Zero Minimum Settlement",
-                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. The yield is automatically sent directly to your Phantom wallet on-chain upon each deployment.",
+                revBadge: "Instant 20% Payout",
+                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. Yields are credited directly and automatically to your Phantom wallet on-chain instantly.",
                 refInputDefault: "Connect wallet to generate referral link...",
                 copy: "Copy Link",
                 engineTitle: "Sovereign Token Deployment",
@@ -381,9 +380,9 @@
                 headerSub: "بروتوكول الإصدار السيادي",
                 connectWallet: "ربط Phantom",
                 revShare: "محرك عوائد الإحالة السيادي",
-                revShareSubtitle: "تقسيم أوتوماتيكي فورية عبر البلوكشين",
-                revBadge: "تسوية فورية بدون حد أدنى",
-                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. يتم تحويل العوائد تلقائياً ومباشرة إلى محفظة Phantom الخاصة بك عبر الشبكة فور كل عملية.",
+                revShareSubtitle: "تقسيم أوتوماتيكي فوري عبر البلوكشين",
+                revBadge: "عائد فوري 20%",
+                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. يتم تحويل الأرباح تلقائياً ومباشرة إلى محفظة Phantom الخاصة بك عبر الشبكة فور كل عملية.",
                 refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
                 copy: "نسخ الرابط",
                 engineTitle: "إصدار العملات السيادية",
@@ -608,7 +607,6 @@
             return result;
         }
 
-        // 🚀 دالة الإطلاق السيادية مع التقسيم الآلي المباشر على البلوكشين
         async function handleLaunch(event) {
             if (event) event.preventDefault();
             
@@ -637,15 +635,13 @@
                 const referrerAddress = localStorage.getItem('chainpump_referrer');
                 const transaction = new solanaWeb3.Transaction();
 
-                const TOTAL_FEE_LAMPORTS = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 10,000,000 Lamports (0.01 SOL)
+                const TOTAL_FEE_LAMPORTS = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
 
                 if (referrerAddress && solanaWeb3.PublicKey.isOnCurve(referrerAddress) && referrerAddress !== userAddress) {
-                    // توجد إحالة: تقسيم أوتوماتيكي (80% للإدارة / 20% للمحيل)
                     const refPubkey = new solanaWeb3.PublicKey(referrerAddress);
-                    const refShareLamports = Math.floor(TOTAL_FEE_LAMPORTS * 0.20); // 0.002 SOL
-                    const adminShareLamports = TOTAL_FEE_LAMPORTS - refShareLamports; // 0.008 SOL
+                    const refShareLamports = Math.floor(TOTAL_FEE_LAMPORTS * 0.20); // 0.002 SOL (20%)
+                    const adminShareLamports = TOTAL_FEE_LAMPORTS - refShareLamports; // 0.008 SOL (80%)
 
-                    // تعليم تحويل الإدارة (80%)
                     transaction.add(
                         solanaWeb3.SystemProgram.transfer({
                             fromPubkey: fromPubkey,
@@ -654,7 +650,6 @@
                         })
                     );
 
-                    // تعليم تحويل المحيل أوتوماتيكياً (20%)
                     transaction.add(
                         solanaWeb3.SystemProgram.transfer({
                             fromPubkey: fromPubkey,
@@ -663,7 +658,6 @@
                         })
                     );
                 } else {
-                    // لا توجد إحالة: التحويل كامل 100% للإدارة (0.01 SOL)
                     transaction.add(
                         solanaWeb3.SystemProgram.transfer({
                             fromPubkey: fromPubkey,
@@ -677,10 +671,7 @@
                 transaction.recentBlockhash = blockhash;
                 transaction.feePayer = fromPubkey;
 
-                // إرسال المعاملة لمحفظة فانتوم للتوقيع الأوتوماتيكي
                 const { signature } = await provider.signAndSendTransaction(transaction);
-                
-                const mockMintAddress = generateRealisticSolanaAddress();
                 const solscanTxUrl = `https://solscan.io/tx/${signature}`;
 
                 showStatus(
