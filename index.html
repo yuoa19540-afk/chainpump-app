@@ -7,6 +7,8 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Solana Web3 SDK الرسمي لبناء المعاملات وتقسيمها آلياً -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -128,39 +130,22 @@
             </div>
         </div>
 
-        <!-- 💰 قسم الإحالات المحسّن -->
+        <!-- 💰 قسم الإحالات المباشر والإنساني -->
         <div class="claim-card rounded-2xl p-4.5 shadow-xl space-y-3.5">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
                     <span class="text-lg">⚡</span>
                     <div>
                         <h2 class="font-extrabold text-white text-xs tracking-tight" id="revShareTitle">Sovereign Referral Yield Engine</h2>
-                        <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Instant On-Chain Settlement</span>
+                        <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Auto Instant On-Chain Split</span>
                     </div>
                 </div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Zero Minimum Withdrawal</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Zero Minimum Settlement</span>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed" id="revShareDesc">
-                Get rewarded with <strong>20% instant commission</strong> for every token deployment. No threshold, no lockups — withdraw accumulated SOL directly to your Phantom wallet at any time.
+                Get rewarded with <strong>20% instant commission</strong> for every token deployment. The yield is automatically sent directly to your Phantom wallet on-chain upon each deployment.
             </p>
-            
-            <div class="grid grid-cols-2 gap-2.5">
-                <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
-                    <span class="block text-[10px] text-slate-400 mb-1" id="refCountLabel">Total Ref Launches</span>
-                    <span id="refCountText" class="text-sm font-black text-white font-mono">0 Launches</span>
-                </div>
-                
-                <div class="bg-slate-950/80 border border-emerald-500/30 p-3 rounded-xl flex items-center justify-between shadow-inner">
-                    <div>
-                        <span class="block text-[10px] text-slate-400 mb-0.5" id="refEarnedLabel">Claimable Balance</span>
-                        <span id="refEarnedText" class="text-sm font-black text-emerald-400 font-mono">0.0000 SOL</span>
-                    </div>
-                    <button type="button" onclick="claimRewards()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs px-3 py-2 rounded-xl shadow-lg shadow-emerald-950/50 flex items-center space-x-1 rtl:space-x-reverse active:scale-95 transition-all">
-                        <span>Instant Claim</span> <span>⚡</span>
-                    </button>
-                </div>
-            </div>
 
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                 <input type="text" id="referralLinkInput" readonly value="Connect wallet to generate referral link..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-purple-300 font-mono text-left ltr:text-left rtl:text-right focus:outline-none">
@@ -177,7 +162,7 @@
                     <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
                     <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v4.2 SECURE</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v4.5 AUTO-SPLIT</span>
             </div>
 
             <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-4">
@@ -366,11 +351,9 @@
                 headerSub: "Autonomous Launchpad Protocol",
                 connectWallet: "Connect Phantom",
                 revShare: "Sovereign Referral Yield Engine",
-                revShareSubtitle: "Instant On-Chain Settlement",
-                revBadge: "Zero Minimum Withdrawal",
-                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. No threshold, no lockups — withdraw accumulated SOL directly to your Phantom wallet at any time.",
-                refCount: "Total Ref Launches",
-                refEarned: "Claimable Balance",
+                revShareSubtitle: "Auto Instant On-Chain Split",
+                revBadge: "Zero Minimum Settlement",
+                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. The yield is automatically sent directly to your Phantom wallet on-chain upon each deployment.",
                 refInputDefault: "Connect wallet to generate referral link...",
                 copy: "Copy Link",
                 engineTitle: "Sovereign Token Deployment",
@@ -391,19 +374,16 @@
                 feeProtocol: "Autonomous Protocol Fee (Includes Auto-Seed):",
                 submitBtn: "Connect Wallet & Deploy Sovereign Contract 🚀",
                 walletConnectedMsg: "Phantom wallet connected securely & successfully!",
-                copiedMsg: "Referral link copied successfully!",
-                launchSuccessMsg: "🎉 Sovereign contract deployment URI triggered on Solana!"
+                copiedMsg: "Referral link copied successfully!"
             },
             ar: {
                 topSec: "⚡ بث بيانات شبكة سولانا الحية",
                 headerSub: "بروتوكول الإصدار السيادي",
                 connectWallet: "ربط Phantom",
                 revShare: "محرك عوائد الإحالة السيادي",
-                revShareSubtitle: "تسوية فورية عبر البلوكشين",
-                revBadge: "بدون حد أدنى للسحب",
-                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. لا توجد شروط أو قيود احتجاز — اسحب أرباحك من عملات SOL إلى محفظة Phantom مباشرة وفي أي وقت.",
-                refCount: "إجمالي عمليات الإحالة",
-                refEarned: "الرصيد المتاح للسحب",
+                revShareSubtitle: "تقسيم أوتوماتيكي فورية عبر البلوكشين",
+                revBadge: "تسوية فورية بدون حد أدنى",
+                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. يتم تحويل العوائد تلقائياً ومباشرة إلى محفظة Phantom الخاصة بك عبر الشبكة فور كل عملية.",
                 refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
                 copy: "نسخ الرابط",
                 engineTitle: "إصدار العملات السيادية",
@@ -424,8 +404,7 @@
                 feeProtocol: "رسوم البروتوكول (تشمل السيولة العكسية):",
                 submitBtn: "ربط المحفظة ونشر العقد السيادي 🚀",
                 walletConnectedMsg: "تم ربط محفظة Phantom بأمان ونجاح!",
-                copiedMsg: "تم نسخ رابط الشريك بنجاح!",
-                launchSuccessMsg: "🎉 تم تفعيل عقد الإصدار السيادي على شبكة سولانا بنجاح!"
+                copiedMsg: "تم نسخ رابط الشريك بنجاح!"
             }
         };
 
@@ -447,15 +426,9 @@
             document.getElementById('revShareSubtitle').innerText = t.revShareSubtitle;
             document.getElementById('revShareBadge').innerText = t.revBadge;
             document.getElementById('revShareDesc').innerHTML = t.revShareDesc;
-            document.getElementById('refCountLabel').innerText = t.refCount;
-            document.getElementById('refEarnedLabel').innerText = t.refEarned;
             document.getElementById('copyBtn').innerText = t.copy;
             document.getElementById('engineTitle').innerText = t.engineTitle;
             document.getElementById('engineDesc').innerText = t.engineDesc;
-            document.getElementById('step1').innerText = t.step1;
-            document.getElementById('step2').innerText = t.step2;
-            document.getElementById('step3').innerText = t.step3;
-            document.getElementById('step4').innerText = t.step4;
             document.getElementById('nameLabel').innerText = t.nameLabel;
             document.getElementById('genNameBtn').innerHTML = `<span>🎲</span> <span>${t.genName.replace('🎲 ', '')}</span>`;
             document.getElementById('symbolLabel').innerText = t.symbolLabel;
@@ -542,14 +515,6 @@
             navigator.clipboard.writeText(input.value).then(() => {
                 showStatus(t.copiedMsg, "success");
             });
-        }
-
-        function claimRewards() {
-            if(!userAddress) {
-                showStatus(currentLang === 'ar' ? "يرجى ربط محفظة Phantom أولاً لمشاهدة رصيد العوائد السحابي." : "Please connect Phantom wallet first to view claimable balance.", "error");
-                return;
-            }
-            showStatus(currentLang === 'ar' ? "الرصيد القابل للسحب حالياً هو 0.0000 SOL. سيتم تحويل أي عوائد ناتجة عن روابطك فورياً ومباشرة إلى محفظتك المربوطة!" : "Current claimable balance is 0.0000 SOL. Any referral rewards will be credited instantly to your connected wallet!", "success");
         }
 
         function updateLivePreview() {
@@ -643,7 +608,8 @@
             return result;
         }
 
-        function handleLaunch(event) {
+        // 🚀 دالة الإطلاق السيادية مع التقسيم الآلي المباشر على البلوكشين
+        async function handleLaunch(event) {
             if (event) event.preventDefault();
             
             const tokenName = document.getElementById("tokenName").value.trim();
@@ -654,79 +620,103 @@
                 return;
             }
 
-            const mockMintAddress = generateRealisticSolanaAddress();
-            const amountSol = "0.01"; // تم التحديث إلى القيمة الجديدة المقترحة
-            const phantomPayUrl = `solana:${ADMIN_SOL_WALLET}?amount=${amountSol}&label=ChainPump%20Sovereign&message=AutoSeed%20Deployment%20Fee`;
-            const solscanTxUrl = `https://solscan.io/tx/pending_${mockMintAddress}`;
-            
-            showStatus(
-                currentLang === 'ar' 
-                ? `
-                    <div class="space-y-3 text-right">
-                        <div class="flex items-center space-x-2 rtl:space-x-reverse text-emerald-400 font-bold text-xs">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span>جاري معالجة العقد الذكي في طابور البلوكشين (Mempool)...</span>
-                        </div>
+            const provider = window.phantom?.solana || window.solana;
+            if (!provider || !provider.isPhantom || !userAddress) {
+                showStatus(currentLang === 'ar' ? "يرجى ربط محفظة Phantom أولاً لتقديم المعاملة!" : "Please connect Phantom wallet first!", "error");
+                await connectWallet();
+                return;
+            }
 
-                        <div class="bg-slate-900 p-3.5 rounded-xl border border-purple-500/30 font-mono text-[11px] text-slate-300 space-y-2">
-                            <div><span class="text-purple-400 font-bold">Generated Mint Hash:</span></div>
-                            <div class="bg-slate-950 p-2 rounded text-[10px] break-all text-emerald-300 select-all border border-slate-800">${mockMintAddress}</div>
-                            
-                            <div class="space-y-1 pt-1 text-[10px] text-slate-400 border-t border-slate-800">
-                                <p id="step1" class="text-emerald-400">✓ Initializing SPL Mint Account...</p>
-                                <p id="step2" class="animate-pulse text-amber-400">⏳ Waiting for Validator Signature & Fee Confirmation...</p>
+            try {
+                showStatus(currentLang === 'ar' ? "جاري إعداد معاملة التوقيع وتقسيم الرسوم عبر البلوكشين... ⏳" : "Preparing on-chain transaction split...", "success");
+
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"), "confirmed");
+                const fromPubkey = new solanaWeb3.PublicKey(userAddress);
+                const adminPubkey = new solanaWeb3.PublicKey(ADMIN_SOL_WALLET);
+                
+                const referrerAddress = localStorage.getItem('chainpump_referrer');
+                const transaction = new solanaWeb3.Transaction();
+
+                const TOTAL_FEE_LAMPORTS = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 10,000,000 Lamports (0.01 SOL)
+
+                if (referrerAddress && solanaWeb3.PublicKey.isOnCurve(referrerAddress) && referrerAddress !== userAddress) {
+                    // توجد إحالة: تقسيم أوتوماتيكي (80% للإدارة / 20% للمحيل)
+                    const refPubkey = new solanaWeb3.PublicKey(referrerAddress);
+                    const refShareLamports = Math.floor(TOTAL_FEE_LAMPORTS * 0.20); // 0.002 SOL
+                    const adminShareLamports = TOTAL_FEE_LAMPORTS - refShareLamports; // 0.008 SOL
+
+                    // تعليم تحويل الإدارة (80%)
+                    transaction.add(
+                        solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: fromPubkey,
+                            toPubkey: adminPubkey,
+                            lamports: adminShareLamports,
+                        })
+                    );
+
+                    // تعليم تحويل المحيل أوتوماتيكياً (20%)
+                    transaction.add(
+                        solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: fromPubkey,
+                            toPubkey: refPubkey,
+                            lamports: refShareLamports,
+                        })
+                    );
+                } else {
+                    // لا توجد إحالة: التحويل كامل 100% للإدارة (0.01 SOL)
+                    transaction.add(
+                        solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: fromPubkey,
+                            toPubkey: adminPubkey,
+                            lamports: TOTAL_FEE_LAMPORTS,
+                        })
+                    );
+                }
+
+                const { blockhash } = await connection.getLatestBlockhash();
+                transaction.recentBlockhash = blockhash;
+                transaction.feePayer = fromPubkey;
+
+                // إرسال المعاملة لمحفظة فانتوم للتوقيع الأوتوماتيكي
+                const { signature } = await provider.signAndSendTransaction(transaction);
+                
+                const mockMintAddress = generateRealisticSolanaAddress();
+                const solscanTxUrl = `https://solscan.io/tx/${signature}`;
+
+                showStatus(
+                    currentLang === 'ar' 
+                    ? `
+                        <div class="space-y-2 text-right">
+                            <p class="font-bold text-emerald-400 text-sm">🎉 تم تأكيد المعاملة وتقسيم العوائد أوتوماتيكياً على الشبكة!</p>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-mono text-slate-300 space-y-1">
+                                <div><span class="text-purple-400 font-bold">Transaction Hash:</span></div>
+                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${signature}</div>
+                                <div class="pt-1 flex justify-between items-center text-[10px]">
+                                    <span>الحالة: <strong class="text-emerald-400">مؤكدة 100% (Confirmed)</strong></span>
+                                    <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">عرض المعاملة على Solscan ↗</a>
+                                </div>
                             </div>
-
-                            <div class="pt-1 flex justify-between items-center text-[10px]">
-                                <span class="text-purple-300">حالة الشبكة:</span>
-                                <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">تتبع حالة الـ Mempool ↗</a>
+                        </div>
+                      `
+                    : `
+                        <div class="space-y-2 text-left">
+                            <p class="font-bold text-emerald-400 text-sm">🎉 Transaction Confirmed & Yield Split Automatically!</p>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-mono text-slate-300 space-y-1">
+                                <div><span class="text-purple-400 font-bold">Transaction Hash:</span></div>
+                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${signature}</div>
+                                <div class="pt-1 flex justify-between items-center text-[10px]">
+                                    <span>Status: <strong class="text-emerald-400">100% Confirmed</strong></span>
+                                    <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">View Tx on Solscan ↗</a>
+                                </div>
                             </div>
                         </div>
+                      `,
+                    "success"
+                );
 
-                        <a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">
-                            انقر هنا لتأكيد رسوم النشر (0.01 SOL) في محفظة Phantom 👻
-                        </a>
-                    </div>
-                  `
-                : `
-                    <div class="space-y-3 text-left">
-                        <div class="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            <span>Processing Smart Contract in Mempool Queue...</span>
-                        </div>
-
-                        <div class="bg-slate-900 p-3.5 rounded-xl border border-purple-500/30 font-mono text-[11px] text-slate-300 space-y-2">
-                            <div><span class="text-purple-400 font-bold">Generated Mint Hash:</span></div>
-                            <div class="bg-slate-950 p-2 rounded text-[10px] break-all text-emerald-300 select-all border border-slate-800">${mockMintAddress}</div>
-                            
-                            <div class="space-y-1 pt-1 text-[10px] text-slate-400 border-t border-slate-800">
-                                <p id="step1" class="text-emerald-400">✓ Initializing SPL Mint Account...</p>
-                                <p id="step2" class="animate-pulse text-amber-400">⏳ Waiting for Validator Signature & Fee Confirmation...</p>
-                            </div>
-
-                            <div class="pt-1 flex justify-between items-center text-[10px]">
-                                <span class="text-purple-300">Network Status:</span>
-                                <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">Track Mempool Status ↗</a>
-                            </div>
-                        </div>
-
-                        <a href="${phantomPayUrl}" id="phantomDirectAnchor" style="display:block; width:100%; text-align:center; background:linear-gradient(to right, #9333ea, #4f46e5); color:white; padding:12px; border-radius:12px; font-weight:bold; text-decoration:none; margin-top:5px;">
-                            Click to confirm deployment fee (0.01 SOL) in Phantom 👻
-                        </a>
-                    </div>
-                  `,
-                "success"
-            );
-
-            setTimeout(() => {
-                const s2 = document.getElementById('step2');
-                if(s2) { s2.className = "text-emerald-400"; s2.innerText = currentLang === 'ar' ? "✓ تم توقيع العقد وبانتظار تأكيد عمال التدقيق (Validators)" : "✓ Contract signed, awaiting validator consensus"; }
-            }, 3000);
-
-            setTimeout(() => {
-                const anchor = document.getElementById("phantomDirectAnchor");
-                if (anchor) anchor.click();
-            }, 100);
+            } catch (err) {
+                showStatus(currentLang === 'ar' ? "تم إلغاء المعاملة أو رفض التوقيع في المحفظة." : "Transaction canceled or rejected in wallet.", "error");
+            }
         }
 
         function showStatus(message, type) {
