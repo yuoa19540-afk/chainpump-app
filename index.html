@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChainPump Sovereign - Solana Master Launchpad</title>
+    <title>ChainPump Sovereign - EVM Master Launchpad</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Solana Web3 SDK الرسمي لبناء المعاملات وتقسيمها آلياً -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <!-- Ethers.js v5 لبناء والتفاعل مع عقود EVM الذكية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body { font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif; background-color: #04060b; color: #f1f5f9; -webkit-font-smoothing: antialiased; }
@@ -49,35 +50,25 @@
     <!-- نافذة الأمان السيادي لمتصفحات التطبيقات المدمجة -->
     <div id="strictBlockerModal" class="hidden fixed inset-0 bg-[#04060b]/98 z-[999999] flex flex-col items-center justify-center p-6 text-center backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-500/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4">
-            
-            <!-- أيقونة الدرع السيادي للثقة والموثوقية -->
             <div class="w-14 h-14 bg-purple-950/80 border border-purple-500/50 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-purple-900/30">
                 🛡️
             </div>
-            
             <h2 class="text-white font-extrabold text-base tracking-wide">تنشيط البروتوكول السيادي للأمان</h2>
-            
             <p class="text-slate-300 text-xs leading-relaxed font-normal">
-                لضمان تشفير التوقيع والتفاعل المباشر مع محفظة Phantom عبر شبكة Solana الرئيسية، يرجى متابعة الاتصال عبر المتصفح الخارجي للمجهولية والأمان العالي، أو نسخ الرابط والدخول مباشرة من متصفح Phantom.
+                لضمان التفاعل المباشر مع عقدك الذكي عبر شبكة EVM، يرجى فتح الرابط في متصفح خارجي (مثل Chrome) أو داخل متصفح محفظة MetaMask.
             </p>
-
-            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-right text-[11px] text-slate-300 space-y-1.5 font-mono">
-                <p>1️⃣ اضغط على <b>النقاط الثلاث (...)</b> في الأعلى واختر <b>"فتح في المتصفح"</b>.</p>
-                <p>2️⃣ <b>أو:</b> قم بنسخ الرابط وفتحه مباشرة داخل متصفح تطبيق <b>Phantom</b>.</p>
-            </div>
-
             <button onclick="copyLinkForUser()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg shadow-purple-900/40 transition-all active:scale-95">
                 نسخ الرابط للمشاركة والفتح 📋
             </button>
         </div>
     </div>
 
-    <!-- شريط الأمان ومراقبة شبكة سولانا الحية -->
+    <!-- شريط الأمان ومراقبة شبكة EVM الحية -->
     <div class="bg-slate-950 border-b border-slate-900 text-slate-400 text-[11px] py-2 px-4">
         <div class="max-w-2xl mx-auto flex justify-between items-center font-mono">
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="solanaTpsDisplay">Solana Mainnet: <strong class="text-emerald-400 font-bold">2,840 TPS</strong></span>
+                <span id="evmNetworkDisplay">EVM Smart Chain: <strong class="text-emerald-400 font-bold">Connected</strong></span>
             </div>
             <div class="flex items-center space-x-3 rtl:space-x-reverse">
                 <span class="text-purple-400 font-semibold" id="walletBalanceDisplay">Wallet: Not Connected</span>
@@ -100,9 +91,9 @@
                 <div>
                     <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
                         <span class="font-extrabold text-sm text-white tracking-tight">ChainPump</span>
-                        <span class="text-[9px] bg-purple-950 text-purple-300 font-bold px-1.5 py-0.5 rounded border border-purple-800">SOVEREIGN</span>
+                        <span class="text-[9px] bg-purple-950 text-purple-300 font-bold px-1.5 py-0.5 rounded border border-purple-800">EVM SOVEREIGN</span>
                     </div>
-                    <span class="block text-[9px] text-slate-500 font-semibold" id="headerSubText">Autonomous Launchpad Protocol</span>
+                    <span class="block text-[9px] text-slate-500 font-semibold" id="headerSubText">Autonomous Factory Launchpad</span>
                 </div>
             </div>
             
@@ -113,7 +104,7 @@
 
                 <button id="connectWalletBtn" onclick="connectWallet()" class="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-300 font-bold px-3 py-1.5 rounded-xl transition-all text-xs flex items-center space-x-1.5 rtl:space-x-reverse shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                    <span id="connectWalletText">Connect Phantom</span>
+                    <span id="connectWalletText">Connect MetaMask</span>
                 </button>
             </div>
         </div>
@@ -125,34 +116,34 @@
         <!-- بطاقات الثقة والأمان الثلاثية -->
         <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
             <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🔥 LP Auto-Burnt</span>
-                <span class="text-[9px] text-slate-400 font-normal">100% Permanently Burnt</span>
+                <span>⚡ Auto Distribution</span>
+                <span class="text-[9px] text-slate-400 font-normal">99.95% to Creator</span>
             </div>
             <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🔒 Authority Revoked</span>
-                <span class="text-[9px] text-slate-400 font-normal">Mint & Freeze Disabled</span>
+                <span>🛡️ Reentrancy Shield</span>
+                <span class="text-[9px] text-slate-400 font-normal">Secure OpenZeppelin</span>
             </div>
             <div class="trust-badge rounded-xl p-2 text-emerald-400 font-bold flex flex-col items-center justify-center space-y-1">
-                <span>🛡️ Anti-Sniper Shield</span>
-                <span class="text-[9px] text-slate-400 font-normal">Fair Launch Engine</span>
+                <span>🚀 Factory Deployed</span>
+                <span class="text-[9px] text-slate-400 font-normal">Direct On-Chain Mint</span>
             </div>
         </div>
 
-        <!-- 💰 قسم الإحالات المحدّث والمصقول بإتقان -->
+        <!-- 💰 قسم الإحالات السيادي المحدّث -->
         <div class="claim-card rounded-2xl p-4.5 shadow-xl space-y-3.5">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 rtl:space-x-reverse">
                     <span class="text-lg">⚡</span>
                     <div>
                         <h2 class="font-extrabold text-white text-xs tracking-tight" id="revShareTitle">Sovereign Referral Yield Engine</h2>
-                        <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Auto Instant On-Chain Split</span>
+                        <span class="text-[10px] text-emerald-400 font-semibold" id="revShareSubtitle">Auto Instant On-Chain Tracker</span>
                     </div>
                 </div>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Instant 20% Payout</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider animate-pulse" id="revShareBadge">Viral Rewards</span>
             </div>
 
             <p class="text-[11px] text-slate-300 leading-relaxed" id="revShareDesc">
-                Get rewarded with <strong>20% instant commission</strong> for every token deployment. Yields are credited directly and automatically to your Phantom wallet on-chain instantly.
+                Share your personalized referral link to invite creators and track deployment metrics instantly on the EVM network.
             </p>
 
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
@@ -163,14 +154,14 @@
             </div>
         </div>
 
-        <!-- Launch Card (بطاقة الإصدار السيادي) -->
+        <!-- Launch Card (بطاقة الإصدار الحقيقي عبر العقد) -->
         <div class="sovereign-card rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="border-b border-slate-800/80 pb-3 flex justify-between items-center">
                 <div>
-                    <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign Token Deployment</h1>
-                    <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.</p>
+                    <h1 id="engineTitle" class="text-base font-bold text-white">Sovereign EVM Token Deployment</h1>
+                    <p class="text-slate-400 text-xs mt-0.5" id="engineDesc">Deploy ERC-20 meme tokens instantly through your Factory contract.</p>
                 </div>
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v4.5 AUTO-SPLIT</span>
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-lg font-bold font-mono">v1.0 FACTORY</span>
             </div>
 
             <form id="launchForm" onsubmit="handleLaunch(event)" class="space-y-4">
@@ -181,7 +172,7 @@
                             <span>🎲</span> <span>Generate Sovereign Name</span>
                         </button>
                     </div>
-                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Solana Sovereign AI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
+                    <input type="text" id="tokenName" oninput="updateLivePreview()" required placeholder="e.g. Sovereign Meme" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500">
                 </div>
 
                 <div>
@@ -249,16 +240,16 @@
                 <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-xs space-y-1.5 text-slate-400 font-mono">
                     <div class="flex justify-between">
                         <span id="supplyLabel" class="font-sans">Total Fixed Supply:</span>
-                        <span class="font-bold text-slate-200">1,000,000,000 SPL</span>
+                        <span class="font-bold text-slate-200">1,000,000,000 Token</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span id="feeProtocolLabel" class="font-sans">Autonomous Protocol Fee (Includes Auto-Seed):</span>
-                        <span id="feeLabel" class="font-bold text-purple-400">0.01 SOL</span>
+                        <span id="feeProtocolLabel" class="font-sans">Factory Creation Fee:</span>
+                        <span id="feeLabel" class="font-bold text-purple-400">0.00025 ETH</span>
                     </div>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-3.5 rounded-xl text-xs tracking-wide shadow-lg shadow-purple-900/30">
-                    Connect Wallet & Deploy Sovereign Contract 🚀
+                    Connect Wallet & Deploy EVM Contract 🚀
                 </button>
             </form>
 
@@ -267,21 +258,27 @@
     </main>
 
     <footer class="border-t border-slate-900 bg-slate-950/60 text-center py-4 text-[11px] text-slate-600">
-        <p>© 2026 ChainPump Sovereign Protocol — Powered by Autonomous Solana Engine</p>
+        <p>© 2026 ChainPump Sovereign Protocol — Powered by EVM Factory Contract</p>
     </footer>
 
+    <!-- EVM Integration Logic -->
     <script>
+        const FACTORY_ADDRESS = "0x92aBcf983Bf92f24A74D97A05d3F4e7F46A64E45";
+        const FACTORY_ABI = [
+            "function deployNewToken(string name, string symbol) external payable returns (address)",
+            "function creationFee() external view returns (uint256)",
+            "function getAllTokensCount() external view returns (uint256)",
+            "function allTokens(uint256) external view returns (address)"
+        ];
+
         let currentLang = 'en';
-        let userAddress = "";
+        let provider, signer, userAddress;
         let canvas, ctx, painting = false;
         let brushColor = "#a855f7";
 
-        const ADMIN_SOL_WALLET = "9wQHot8ivTqNqJvzzDdV6Hkna7xEd3kp5CGVTLDik17w";
-
-        const massiveSolanaTokens = [
-            "BONK", "WIF", "BOME", "POPCAT", "SLERF", "MEW", "MYRO", "SILLY", "PONKE", "SAMO",
-            "CHONKY", "MANEKI", "WEN", "NOP", "GIGA", "RETARDIO", "SHIT", "PEPER", "TOST", "SCAM",
-            "SOLZ", "GOAT", "LUCE", "PNUT", "MOODENG", "SUNDOG", "MICHI", "NEIRO", "KOMA", "ZEREBRO"
+        const massiveEvmTokens = [
+            "PEPE", "SHIB", "FLOKI", "BONK", "DOGE", "BRETT", "DEGEN", "MOCHI", "TYBG", "SKI",
+            "MOG", "WIF", "BOME", "MYRO", "PONKE", "GIGA", "GOAT", "LUCE", "NEIRO", "ZEREBRO"
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -300,7 +297,7 @@
                 let refParam = urlParams.get('ref');
                 if (refParam) {
                     refParam = refParam.split('&')[0].trim();
-                    if (refParam.length >= 32) {
+                    if (refParam.length >= 40) {
                         localStorage.setItem('chainpump_referrer', refParam);
                     }
                 }
@@ -314,7 +311,7 @@
                     if(secretClicks >= 5) {
                         secretClicks = 0;
                         let total = localStorage.getItem('cp_visitor_exact') || "1";
-                        alert(`🔒 [Sovereign Admin Console]\n\n📊 Total Verified Visitors: ${total}\n⚡ Autonomous Engine: Operational & Secure`);
+                        alert(`🔒 [Sovereign EVM Admin Console]\n\n📊 Total Visitors: ${total}\n⚡ Factory Address: ${FACTORY_ADDRESS}`);
                     }
                 });
             }
@@ -328,7 +325,7 @@
             if (!container) return;
             container.innerHTML = "";
 
-            let shuffled = [...massiveSolanaTokens].sort(() => 0.5 - Math.random());
+            let shuffled = [...massiveEvmTokens].sort(() => 0.5 - Math.random());
             let fullList = [...shuffled, ...shuffled];
 
             fullList.forEach(token => {
@@ -347,7 +344,7 @@
 
         function copyLinkForUser() {
             navigator.clipboard.writeText(window.location.href).then(() => {
-                alert("✅ تم نسخ الرابط بنجاح! افتح متصفح كروم أو فانتوم والصقه هناك.");
+                alert("✅ تم نسخ الرابط بنجاح! افتح متصفح Chrome أو MetaMask والصقه هناك.");
             }).catch(() => {
                 alert("يرجى نسخ الرابط يدويًا وفتحه في متصفح خارجي.");
             });
@@ -355,17 +352,16 @@
 
         const translations = {
             en: {
-                topSec: "⚡ Live Solana Mainnet Stream",
-                headerSub: "Autonomous Launchpad Protocol",
-                connectWallet: "Connect Phantom",
+                headerSub: "Autonomous Factory Launchpad",
+                connectWallet: "Connect MetaMask",
                 revShare: "Sovereign Referral Yield Engine",
-                revShareSubtitle: "Auto Instant On-Chain Split",
-                revBadge: "Instant 20% Payout",
-                revShareDesc: "Get rewarded with <strong>20% instant commission</strong> for every token deployment. Yields are credited directly and automatically to your Phantom wallet on-chain instantly.",
+                revShareSubtitle: "Auto Instant On-Chain Tracker",
+                revBadge: "Viral Rewards",
+                revShareDesc: "Share your personalized referral link to invite creators and track deployment metrics instantly on the EVM network.",
                 refInputDefault: "Connect wallet to generate referral link...",
                 copy: "Copy Link",
-                engineTitle: "Sovereign Token Deployment",
-                engineDesc: "Autonomous SPL creation with Auto-Seed Rebate & Anti-Sniper Shield.",
+                engineTitle: "Sovereign EVM Token Deployment",
+                engineDesc: "Deploy ERC-20 meme tokens instantly through your Factory contract.",
                 nameLabel: "Token Name",
                 genName: "🎲 Generate Sovereign Name",
                 symbolLabel: "Ticker Symbol",
@@ -378,23 +374,22 @@
                 clearBtn: "Clear 🗑️",
                 applyBtn: "Apply ✨",
                 supply: "Total Fixed Supply:",
-                feeProtocol: "Autonomous Protocol Fee (Includes Auto-Seed):",
-                submitBtn: "Connect Wallet & Deploy Sovereign Contract 🚀",
-                walletConnectedMsg: "Phantom wallet connected securely & successfully!",
+                feeProtocol: "Factory Creation Fee:",
+                submitBtn: "Connect Wallet & Deploy EVM Contract 🚀",
+                walletConnectedMsg: "MetaMask wallet connected securely & successfully!",
                 copiedMsg: "Referral link copied successfully!"
             },
             ar: {
-                topSec: "⚡ بث بيانات شبكة سولانا الحية",
-                headerSub: "بروتوكول الإصدار السيادي",
-                connectWallet: "ربط Phantom",
-                revShare: "محرك عوائد الإحالة السيادي",
-                revShareSubtitle: "تقسيم أوتوماتيكي فوري عبر البلوكشين",
-                revBadge: "عائد فوري 20%",
-                revShareDesc: "احصل على **عمولة فورية 20%** عن كل عملية إصدار تتم عبر رابطك. يتم تحويل الأرباح تلقائياً ومباشرة إلى محفظة Phantom الخاصة بك عبر الشبكة فور كل عملية.",
+                headerSub: "مصنع إطلاق العملات الأوتوماتيكي",
+                connectWallet: "ربط MetaMask",
+                revShare: "محرك إحالات البروتوكول السيادي",
+                revShareSubtitle: "تتبع فوري عبر شبكة EVM",
+                revBadge: "أرباح فيروسية",
+                revShareDesc: "شارك رابط الإحالة الخاص بك لدعوة المنشئين وتتبع عمليات الإصدار لحظياً وبكل سهولة عبر شبكة EVM.",
                 refInputDefault: "يرجى ربط المحفظة لتوليد الرابط المعتمد...",
                 copy: "نسخ الرابط",
-                engineTitle: "إصدار العملات السيادية",
-                engineDesc: "إنشاء أصول SPL مع دعم السيولة العكسية التلقائية ودرع الحماية.",
+                engineTitle: "إصدار العملات عبر عقد المصنع",
+                engineDesc: "أنشئ توكن ERC-20 مع توزيع أوتوماتيكي فوري بنسبة 99.95% للمنشئ.",
                 nameLabel: "اسم العملة / الأصل",
                 genName: "🎲 توليد اسم سيادي",
                 symbolLabel: "الرمز المالي المقتضب",
@@ -407,9 +402,9 @@
                 clearBtn: "مسح 🗑️",
                 applyBtn: "اعتماد ✨",
                 supply: "إجمالي المعروض الثابت:",
-                feeProtocol: "رسوم البروتوكول (تشمل السيولة العكسية):",
-                submitBtn: "ربط المحفظة ونشر العقد السيادي 🚀",
-                walletConnectedMsg: "تم ربط محفظة Phantom بأمان ونجاح!",
+                feeProtocol: "رسوم إنشاء المصنع:",
+                submitBtn: "ربط المحفظة ونشر العقد 🚀",
+                walletConnectedMsg: "تم ربط محفظة MetaMask بأمان ونجاح!",
                 copiedMsg: "تم نسخ رابط الشريك بنجاح!"
             }
         };
@@ -468,48 +463,27 @@
 
         async function connectWallet() {
             const t = translations[currentLang];
-            try {
-                const provider = window.phantom?.solana || window.solana;
-                if (provider && provider.isPhantom) {
-                    const response = await provider.connect();
-                    userAddress = response.publicKey.toString();
-
-                    try {
-                        const rpcRes = await fetch("https://api.mainnet-beta.solana.com", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                jsonrpc: "2.0",
-                                id: 1,
-                                method: "getBalance",
-                                params: [userAddress]
-                            })
-                        });
-                        const rpcData = await rpcRes.json();
-                        if (rpcData && rpcData.result && typeof rpcData.result.value === 'number') {
-                            const solBalance = (rpcData.result.value / 1e9).toFixed(4);
-                            document.getElementById('walletBalanceDisplay').innerHTML = `Balance: <strong class="text-emerald-400 font-mono">${solBalance} SOL</strong>`;
-                        }
-                    } catch (netErr) {
-                        const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
-                        document.getElementById('walletBalanceDisplay').innerHTML = `Connected: <strong class="text-emerald-400 font-mono">${shortAddr}</strong>`;
-                    }
-
-                } else {
-                    const currentUrl = window.location.href;
-                    window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}?ref=${encodeURIComponent(window.location.origin)}`;
-                    return;
-                }
-            } catch (err) {
-                showStatus("Connection canceled or failed.", "error");
+            if (!window.ethereum) {
+                alert("يرجى تثبيت محفظة MetaMask أو استخدام متصفح يدعم EVM!");
                 return;
             }
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
 
-            if(userAddress) {
-                const shortAddr = userAddress.substring(0, 4) + "..." + userAddress.substring(userAddress.length - 4);
+                const balanceWei = await signer.getBalance();
+                const balanceEth = parseFloat(ethers.utils.formatEther(balanceWei)).toFixed(4);
+                document.getElementById('walletBalanceDisplay').innerHTML = `Balance: <strong class="text-emerald-400 font-mono">${balanceEth} ETH</strong>`;
+
+                const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
                 document.getElementById("connectWalletBtn").innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>${shortAddr}</span>`;
                 document.getElementById('referralLinkInput').value = `${window.location.origin}${window.location.pathname}?ref=${userAddress}`;
                 showStatus(t.walletConnectedMsg, "success");
+
+            } catch (err) {
+                showStatus("Connection canceled or failed.", "error");
             }
         }
 
@@ -531,9 +505,9 @@
 
         function spinDestinyWheel() {
             const list = [
-                { name: "Solana Sovereign Prime", symbol: "PRIME" },
-                { name: "Quantum Autonomous Vault", symbol: "QVLT" },
-                { name: "Alpha Sovereign AI", symbol: "SOVAI" }
+                { name: "Sovereign Meme Prime", symbol: "PRIME" },
+                { name: "Quantum Autonomous Token", symbol: "QVLT" },
+                { name: "Alpha Sovereign EVM", symbol: "SOVAI" }
             ];
             const pick = list[Math.floor(Math.random() * list.length)];
             document.getElementById("tokenName").value = pick.name;
@@ -592,7 +566,7 @@
         }
 
         async function generateRealAILogo() {
-            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "solana sovereign token logo vector minimal dark";
+            let userPrompt = document.getElementById('aiPromptInput').value.trim() || "evm sovereign token logo vector minimal dark";
             const btn = document.getElementById('aiGenBtn');
             btn.innerText = currentLang === 'ar' ? "جاري التوليد... ⏳" : "Generating... ⏳";
             const generatedUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(userPrompt)}?width=256&height=256&nologo=true`;
@@ -602,15 +576,6 @@
                 document.getElementById('previewLogoContainer').innerHTML = `<img src="${generatedUrl}" class="w-full h-full object-cover">`;
                 btn.innerText = currentLang === 'ar' ? "اعتماد ✨" : "Generate ✨";
             };
-        }
-
-        function generateRealisticSolanaAddress() {
-            const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-            let result = "";
-            for (let i = 0; i < 44; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
         }
 
         async function handleLaunch(event) {
@@ -624,87 +589,43 @@
                 return;
             }
 
-            const provider = window.phantom?.solana || window.solana;
-            if (!provider || !provider.isPhantom || !userAddress) {
-                showStatus(currentLang === 'ar' ? "يرجى ربط محفظة Phantom أولاً لتقديم المعاملة!" : "Please connect Phantom wallet first!", "error");
+            if (!signer || !userAddress) {
+                showStatus(currentLang === 'ar' ? "يرجى ربط محفظة MetaMask أولاً!" : "Please connect MetaMask wallet first!", "error");
                 await connectWallet();
                 return;
             }
 
             try {
-                showStatus(currentLang === 'ar' ? "جاري إعداد معاملة التوقيع وتقسيم الرسوم عبر البلوكشين... ⏳" : "Preparing on-chain transaction split...", "success");
+                showStatus(currentLang === 'ar' ? "جاري إرسال المعاملة واستدعاء عقد المصنع... ⏳" : "Preparing on-chain contract deployment...", "success");
 
-                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"), "confirmed");
-                const fromPubkey = new solanaWeb3.PublicKey(userAddress);
-                const adminPubkey = new solanaWeb3.PublicKey(ADMIN_SOL_WALLET);
+                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
                 
-                const referrerAddress = localStorage.getItem('chainpump_referrer');
-                const transaction = new solanaWeb3.Transaction();
+                // جلب قيمة رسوم الإنشاء من العقد مباشرة
+                const creationFee = await factoryContract.creationFee();
 
-                const TOTAL_FEE_LAMPORTS = 0.01 * solanaWeb3.LAMPORTS_PER_SOL; // 0.01 SOL
-
-                if (referrerAddress && solanaWeb3.PublicKey.isOnCurve(referrerAddress) && referrerAddress !== userAddress) {
-                    const refPubkey = new solanaWeb3.PublicKey(referrerAddress);
-                    const refShareLamports = Math.floor(TOTAL_FEE_LAMPORTS * 0.20); // 0.002 SOL (20%)
-                    const adminShareLamports = TOTAL_FEE_LAMPORTS - refShareLamports; // 0.008 SOL (80%)
-
-                    transaction.add(
-                        solanaWeb3.SystemProgram.transfer({
-                            fromPubkey: fromPubkey,
-                            toPubkey: adminPubkey,
-                            lamports: adminShareLamports,
-                        })
-                    );
-
-                    transaction.add(
-                        solanaWeb3.SystemProgram.transfer({
-                            fromPubkey: fromPubkey,
-                            toPubkey: refPubkey,
-                            lamports: refShareLamports,
-                        })
-                    );
-                } else {
-                    transaction.add(
-                        solanaWeb3.SystemProgram.transfer({
-                            fromPubkey: fromPubkey,
-                            toPubkey: adminPubkey,
-                            lamports: TOTAL_FEE_LAMPORTS,
-                        })
-                    );
-                }
-
-                const { blockhash } = await connection.getLatestBlockhash();
-                transaction.recentBlockhash = blockhash;
-                transaction.feePayer = fromPubkey;
-
-                const { signature } = await provider.signAndSendTransaction(transaction);
-                const solscanTxUrl = `https://solscan.io/tx/${signature}`;
+                // استدعاء دالة deployNewToken الحقيقية مع إرسال رسوم العقد
+                const tx = await factoryContract.deployNewToken(tokenName, tokenSymbol, { value: creationFee });
+                
+                showStatus(currentLang === 'ar' ? "جاري تأكيد المعاملة على الشبكة... ⏳" : "Waiting for transaction confirmation...", "success");
+                const receipt = await tx.wait();
 
                 showStatus(
                     currentLang === 'ar' 
                     ? `
                         <div class="space-y-2 text-right">
-                            <p class="font-bold text-emerald-400 text-sm">🎉 تم تأكيد المعاملة وتقسيم العوائد أوتوماتيكياً على الشبكة!</p>
+                            <p class="font-bold text-emerald-400 text-sm">🎉 مبروك! تم إطلاق عملتك وإنشاء العقد وتوزيع الحصص بنجاح تام!</p>
                             <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-mono text-slate-300 space-y-1">
                                 <div><span class="text-purple-400 font-bold">Transaction Hash:</span></div>
-                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${signature}</div>
-                                <div class="pt-1 flex justify-between items-center text-[10px]">
-                                    <span>الحالة: <strong class="text-emerald-400">مؤكدة 100% (Confirmed)</strong></span>
-                                    <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">عرض المعاملة على Solscan ↗</a>
-                                </div>
+                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${receipt.transactionHash}</div>
                             </div>
                         </div>
                       `
                     : `
                         <div class="space-y-2 text-left">
-                            <p class="font-bold text-emerald-400 text-sm">🎉 Transaction Confirmed & Yield Split Automatically!</p>
+                            <p class="font-bold text-emerald-400 text-sm">🎉 Success! Token Deployed & Shares Distributed Autonomously!</p>
                             <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/30 text-[11px] font-mono text-slate-300 space-y-1">
                                 <div><span class="text-purple-400 font-bold">Transaction Hash:</span></div>
-                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${signature}</div>
-                                <div class="pt-1 flex justify-between items-center text-[10px]">
-                                    <span>Status: <strong class="text-emerald-400">100% Confirmed</strong></span>
-                                    <a href="${solscanTxUrl}" target="_blank" class="text-purple-400 underline font-bold">View Tx on Solscan ↗</a>
-                                </div>
+                                <div class="bg-slate-950 p-1.5 rounded text-[10px] break-all text-emerald-300 select-all">${receipt.transactionHash}</div>
                             </div>
                         </div>
                       `,
@@ -712,7 +633,8 @@
                 );
 
             } catch (err) {
-                showStatus(currentLang === 'ar' ? "تم إلغاء المعاملة أو رفض التوقيع في المحفظة." : "Transaction canceled or rejected in wallet.", "error");
+                console.error(err);
+                showStatus(currentLang === 'ar' ? "تم إلغاء المعاملة أو حدث خطأ في محفظتك." : "Transaction canceled or failed.", "error");
             }
         }
 
