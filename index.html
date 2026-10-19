@@ -1,2 +1,238 @@
-ينوسةسوسويوثوثوثوثويزيو،رjshshsbsv
-sbsbsvsv
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
+
+interface IUniswapV2Router02 {
+    function WETH() external pure returns (address);
+    function factory() external pure returns (address);
+    function addLiquidityETH(
+        address token,
+        uint amountTokenDesired,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
+    
+    function swapExactTokensForETHSupportingFeeOnTransferTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external;
+}
+
+interface IUniswapV2Factory {
+    function createPair(address tokenA, address tokenB) external returns (address pair);
+}
+
+interface IERC20 {
+    function balanceOf(address account) external view returns (uint256);
+}
+
+contract TsunamiHyperEngine {
+    string public constant name = "Tsunami Hyper Engine";
+    string public constant symbol = "TSUNAMI";
+    uint8 public constant decimals = 18;
+    uint256 private _totalSupply = 100_000_000 * 10**18;
+
+    mapping(address => uint256) private _balances;
+    mapping(address => mapping(address => uint256)) private _allowances;
+
+    address public owner;
+    IUniswapV2Router02 public immutable uniswapV2Router;
+    address public immutable uniswapV2Pair;
+
+    uint256 public constant NORMAL_TAX = 5; 
+    uint256 public flashWindowEndTime; 
+    uint256 public constant FLASH_WINDOW_DURATION = 180; // 3 دقائق من الهيجان
+    uint256 public swapThreshold = 1000 * 10**18;
+
+    bool private swapping;
+    bool public initialSparkDone = false;
+    address payable public immutable marketingWallet;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event FlashWindowTriggered(uint256 endTime);
+    event BotBribePaid(address indexed bot, uint256 bnbAmount);
+    event FirstSparkFired(uint256 bnbSpent, uint256 tokensAdded);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    modifier lockTheSwap {
+        require(!swapping, "Already swapping");
+        swapping = true;
+        _;
+        swapping = false;
+    }
+
+    constructor(address _routerAddress, address payable _marketingWallet) payable {
+        require(_routerAddress != address(0), "Invalid router");
+        require(_marketingWallet != address(0), "Invalid wallet");
+        
+        owner = msg.sender;
+        marketingWallet = _marketingWallet;
+        
+        uint256 creatorAmount = _totalSupply / 2;
+        uint256 contractAmount = _totalSupply - creatorAmount;
+
+        _balances[msg.sender] = creatorAmount;
+        emit Transfer(address(0), msg.sender, creatorAmount);
+
+        _balances[address(this)] = contractAmount;
+        emit Transfer(address(0), address(this), contractAmount);
+
+        uniswapV2Router = IUniswapV2Router02(_routerAddress);
+        uniswapV2Pair = IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH());
+    }
+
+    function totalSupply() external view returns (uint256) { return _totalSupply; }
+    function balanceOf(address account) external view returns (uint256) { return _balances[account]; }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        _allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
+    function allowance(address holder, address spender) external view returns (uint256) {
+        return _allowances[holder][spender];
+    }
+
+    function transfer(address recipient, uint256 amount) external returns (bool) {
+        return _transfer(msg.sender, recipient, amount);
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
+        uint256 currentAllowance = _allowances[sender][msg.sender];
+        require(currentAllowance >= amount, "Allowance exceeded");
+        _allowances[sender][msg.sender] = currentAllowance - amount;
+        return _transfer(sender, recipient, amount);
+    }
+
+    function _transfer(address sender, address recipient, uint256 amount) internal returns (bool) {
+        require(sender != address(0), "Transfer from zero");
+        require(recipient != address(0), "Transfer to zero");
+        require(_balances[sender] >= amount, "Insufficient balance");
+
+        bool isTaxed = !swapping && sender != owner && recipient != owner && sender != address(this) && recipient != address(this);
+        uint256 taxAmount = 0;
+
+        if (!swapping && sender == uniswapV2Pair && recipient != address(this) && block.timestamp >= flashWindowEndTime) {
+             flashWindowEndTime = block.timestamp + FLASH_WINDOW_DURATION;
+             emit FlashWindowTriggered(flashWindowEndTime);
+        }
+
+        if (isTaxed && (sender == uniswapV2Pair || recipient == uniswapV2Pair)) {
+            bool isFlashWindowActive = block.timestamp < flashWindowEndTime;
+            uint256 currentTax = isFlashWindowActive ? 0 : NORMAL_TAX;
+            
+            if (currentTax > 0) {
+                taxAmount = (amount * currentTax) / 100;
+                _balances[address(this)] += taxAmount;
+                emit Transfer(sender, address(this), taxAmount);
+            }
+        }
+
+        uint256 finalAmount = amount - taxAmount;
+        _balances[sender] -= amount;
+        _balances[recipient] += finalAmount;
+        emit Transfer(sender, recipient, finalAmount);
+
+        return true;
+    }
+
+    // الشرارة الأولى: إضافة السيولة وقفل الـ LP نهائياً بإرسالها لعنوان الحرق
+    function triggerFirstSpark() external payable onlyOwner {
+        require(!initialSparkDone, "Spark already fired");
+        require(msg.value > 0, "Send BNB for liquidity");
+
+        uint256 tokenAmount = _balances[address(this)];
+        require(tokenAmount > 0, "No tokens available for liquidity");
+
+        _allowances[address(this)][address(uniswapV2Router)] = tokenAmount;
+
+        // إرسال رموز السيولة (LP) إلى عنوان الحرق لقفلها للأبد
+        address deadAddress = 0x000000000000000000000000000000000000dEaD;
+
+        uniswapV2Router.addLiquidityETH{value: msg.value}(
+            address(this),
+            tokenAmount,
+            0,
+            0,
+            deadAddress, 
+            block.timestamp + 300
+        );
+
+        initialSparkDone = true;
+        flashWindowEndTime = block.timestamp + FLASH_WINDOW_DURATION;
+        emit FirstSparkFired(msg.value, tokenAmount);
+        emit FlashWindowTriggered(flashWindowEndTime);
+    }
+
+    // إلغاء صلاحية المالك نهائياً
+    function renounceOwnership() external onlyOwner {
+        emit OwnershipTransferred(owner, address(0));
+        owner = address(0);
+    }
+
+    function processTaxesAndClaimBribe() external lockTheSwap {
+        uint256 tokenBalance = _balances[address(this)];
+        require(tokenBalance >= swapThreshold, "Token balance below threshold");
+
+        uint256 initialBalance = address(this).balance;
+
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = uniswapV2Router.WETH();
+
+        _allowances[address(this)][address(uniswapV2Router)] = tokenBalance;
+
+        try uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenBalance,
+            0,
+            path,
+            address(this),
+            block.timestamp + 300
+        ) {
+            _allowances[address(this)][address(uniswapV2Router)] = 0;
+
+            uint256 newBnb = address(this).balance - initialBalance;
+            if (newBnb > 0) {
+                uint256 botBribe = (newBnb * 10) / 100;
+                uint256 marketingAmount = newBnb - botBribe;
+
+                (bool successBribe, ) = payable(msg.sender).call{value: botBribe}("");
+                require(successBribe, "Bribe transfer failed");
+
+                (bool successMarketing, ) = marketingWallet.call{value: marketingAmount}("");
+                require(successMarketing, "Marketing transfer failed");
+
+                emit BotBribePaid(msg.sender, botBribe);
+            }
+        } catch {
+            _allowances[address(this)][address(uniswapV2Router)] = 0;
+            revert("Swap execution failed");
+        }
+    }
+
+    function updateSwapThreshold(uint256 _newThreshold) external onlyOwner {
+        require(_newThreshold > 0, "Invalid threshold");
+        swapThreshold = _newThreshold;
+    }
+
+    function emergencyWithdrawETH() external onlyOwner {
+        uint256 bnbBalance = address(this).balance;
+        require(bnbBalance > 0, "No BNB to withdraw");
+        (bool success, ) = payable(owner).call{value: bnbBalance}("");
+        require(success, "ETH withdrawal failed");
+    }
+
+    receive() external payable {}
+}
+الكود بحاجة إلى تعديل بسيط وحرج قبل النشر، لأن إلغاء الملكية (renounceOwnership) سيؤدي إلى تعطيل دالتي updateSwapThreshold و emergencyWithdrawETH المستقبليتين، الأهم من ذلك أن دالة triggerFirstSpark تشت أن يكون المنفذ هو المالك (onlyOwner)، هل يمكن حل هذا الأمر بعبقريه 
